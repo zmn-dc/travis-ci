@@ -29,7 +29,7 @@
     
     [self loadGifView];
     
-    self.view.backgroundColor = UIColor.greenColor;
+    self.view.backgroundColor = UIColor.redColor;
 }
 
 - (void)loadGifView {
