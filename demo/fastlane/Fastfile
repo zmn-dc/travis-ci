@@ -1,0 +1,306 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+#全局变量
+
+xm_appurl_dc_test = "https://www.pgyer.com/CsJA"
+xm_appurl_dc_pro  = "https://www.pgyer.com/Mgfr"
+
+
+xm_appurl_test = "https://www.pgyer.com/iAX7"
+xm_appurl_pro  = "https://www.pgyer.com/93fV"
+
+
+default_platform(:ios)
+
+# 网络请求依赖
+require 'net/http'
+require 'uri'
+require 'json'
+
+platform :ios do
+  desc "Description of what the lane does"
+  lane :custom_lane do
+    # add actions here: https://docs.fastlane.tools/actions
+  end
+  
+
+  # 功能
+
+  desc "耗时秒数文案"
+  lane :textTimeConsuming do |option|
+    
+    diff = (option[:diff]).to_i
+
+    hour = diff / 3600
+    min = (diff % 3600) / 60
+    sec = diff % 60
+
+    str = ""
+    if hour > 0
+      str = "总耗时#{hour}时#{min}分#{sec}秒"
+    elsif min > 0
+      str = "总耗时#{min}分#{sec}秒"
+    else
+      str = "总耗时#{sec}秒"
+    end
+
+    #打印
+    puts str
+
+  end
+
+
+  # build App
+
+  desc "build 小码宝贝 debug 包"
+  lane :xm_build_debug do 
+
+    # automatic_code_signing(
+    #   use_automatic_signing: true,
+    #   team_id: "72T6P5AJGB",
+    # )
+
+    time = Time.new.strftime("%Y%m%d_%H%M%S") #获取时间格式
+    version = get_version_number#获取版本号
+    ipaName = "Debug_#{version}_#{time}.ipa"
+    build_app(
+      export_method:"development",#打包的类型app-store, ad-hoc, package, enterprise, development
+      configuration: "Debug",#模式，默认Release，还有Debug
+      scheme: "XMBaby",
+      clean: true,
+      export_options: {
+        provisioningProfiles: { #pp文件
+          "com.xiaomajiaoyu.babydev"=>"XMBaby-debug",
+          "com.xiaomajiaoyu.baby"=>"XMBaby-Dev"
+        },
+      },
+      output_directory:"./build",#输出的位置
+      output_name:"#{ipaName}",#输出的包名
+    )
+  end
+
+
+  desc "build 小码宝贝 release 包"
+  lane :xm_build_release do 
+    time = Time.new.strftime("%Y%m%d_%H%M%S") #获取时间格式
+    version = get_version_number#获取版本号
+    ipaName = "Release_#{version}_#{time}.ipa"
+    build_app(
+      export_method:"development",#打包的类型
+      configuration: "Release",#模式，默认Release，还有Debug
+      scheme: "XMBaby",
+      clean: true,
+      export_options: {
+        provisioningProfiles: { #pp文件
+          "com.xiaomajiaoyu.babydev"=>"XMBaby-debug",
+          "com.xiaomajiaoyu.baby"=>"XMBaby-Dev"
+        },
+      },
+      output_directory:"./build",#输出的位置
+      output_name:"#{ipaName}",#输出的包名
+    )
+  end
+
+  desc "build 小码宝贝 app-store 包"
+  lane :xm_build_appstore do 
+    time = Time.new.strftime("%Y%m%d_%H%M%S") #获取时间格式
+    version = get_version_number#获取版本号
+    ipaName = "AppStore_Release_#{version}_#{time}.ipa"
+    build_app(
+      export_method:"app-store",#打包的类型
+      configuration: "Release",#模式，默认Release，还有Debug
+      scheme: "XMBaby",
+      clean: true,
+      export_options: {
+        provisioningProfiles: { #pp文件
+          "com.xiaomajiaoyu.baby"=>"XMBaby"
+        },
+      },
+      output_directory:"./build",#输出的位置
+      output_name:"#{ipaName}",#输出的包名
+    )
+  end
+
+
+
+  # 上传ipa包到分发平台
+
+  desc "蒲公英-debug-打包 戴超"
+  lane :pg_debug_dc do  #函数名称，执行打包的时候使用
+    
+    #打包
+    xm_build_debug
+    #上传
+    pgyer(api_key: "0fd69bb400438cf18e914704292eb3e9", user_key: "e49aed53ac4874d880508742a6871523", update_description: "dc-测试环境")
+    #发邮件
+    mail_test(release:'0')
+    #钉钉机器人通知
+    app_icon = "https://cdn-app-icon.pgyer.com/8/6/6/3/3/86633507e1d2532afa6defa436c62db3?x-oss-process=image/resize,m_lfit,h_120,w_120/format,jpg"
+    ding_talk(release:0, ipa_path:(lane_context[SharedValues::IPA_OUTPUT_PATH]), app_url:xm_appurl_dc_test, app_icon:app_icon)
+
+  end
+
+  desc "蒲公英-release-打包 戴超"
+  lane :pg_release_dc do  #函数名称，执行打包的时候使用
+    
+    #打包
+    xm_build_release
+    #上传
+    pgyer(api_key: "0fd69bb400438cf18e914704292eb3e9", user_key: "e49aed53ac4874d880508742a6871523", update_description: "dc-生产环境")
+    #发邮件
+    mail_test(release:'1')
+    #钉钉机器人通知
+    app_icon = "https://cdn-app-icon.pgyer.com/5/e/2/3/d/5e23d632af420bc0229c45b9965514f2?x-oss-process=image/resize,m_lfit,h_120,w_120/format,jpg"
+    ding_talk(release:1, ipa_path:(lane_context[SharedValues::IPA_OUTPUT_PATH]), app_url:xm_appurl_dc_pro, app_icon:app_icon)
+
+  end
+
+
+  desc "Fir.im-debug-打包 戴超"
+  lane :fir_debug_dc do  #函数名称，执行打包的时候使用
+
+    #打包
+    xm_build_debug
+    # 上传
+    fir_cli api_token:"4e64f4047b2ce70d0450ca9ff039de8f", changelog:"戴超01测试一下", skip_update_icon:true
+    #发送邮件
+    mail_test(release:'1')
+
+  end
+
+
+
+
+
+
+
+
+  desc "蒲公英-debug-打包 小码宝贝"
+  lane :pg_debug do  #函数名称，执行打包的时候使用
+    
+    #打包
+    xm_build_debug
+    #上传
+    pgyer(api_key: "97882a85dd248b105e4579cc3d9c8721", user_key: "3c545fd1553a74d06b1a1c21bdc92f04", update_description: "测试环境")
+    #发邮件
+    mail(release:'0')
+    #钉钉机器人通知
+    app_icon = "https://cdn-app-icon.pgyer.com/5/4/2/c/8/542c85b4e0332e0b571f52ca33dedf44?x-oss-process=image/resize,m_lfit,h_120,w_120/format,jpg"
+    ding_talk(release:1, ipa_path:(lane_context[SharedValues::IPA_OUTPUT_PATH]), app_url:xm_appurl_test, app_icon:app_icon)
+
+  end
+
+  desc "蒲公英-release-打包 小码宝贝"
+  lane :pg_release do  #函数名称，执行打包的时候使用
+    
+    #打包
+    xm_build_release
+    #上传
+    pgyer(api_key: "97882a85dd248b105e4579cc3d9c8721", user_key: "3c545fd1553a74d06b1a1c21bdc92f04", update_description: "生产环境")
+    #发邮件
+    mail(release:'1')
+    #钉钉机器人通知
+    app_icon = "https://cdn-app-icon.pgyer.com/4/7/0/b/a/470bad0fc36f35ce4c23020ed99374ae?x-oss-process=image/resize,m_lfit,h_120,w_120/format,jpg"
+    ding_talk(release:1, ipa_path:(lane_context[SharedValues::IPA_OUTPUT_PATH]), app_url:xm_appurl_pro, app_icon:app_icon)
+
+  end
+
+
+
+
+
+  #定义一个带参的lane，在fastfile中option类似于一个字典集。我们可以通过 option[:configuration] 取其中value
+
+  desc "发送邮件"
+  lane :mail do |option|
+
+    release = option[:release]
+    content = "fix-bug"
+    #发送邮件
+    exec "python sendmail.py 标题 #{content} #{release}"
+
+  end
+  
+  
+  #测试功能区域
+  
+  
+  desc "发送测试邮件，发送给自己"
+  lane :mail_test do |option|
+    release = option[:release]
+    content = "fix-bug"
+    #发送邮件
+    exec "python sendmail-test.py 标题 #{content} #{release}"
+  end
+
+  
+
+
+
+
+  lane :ding_talk do |option|
+    
+    # 钉钉机器人
+    app_patch   = option[:ipa_path]
+    app_version = get_ipa_info_plist_value(ipa: app_patch, key: "CFBundleShortVersionString")
+    app_build_version = get_ipa_info_plist_value(ipa: app_patch, key: "CFBundleVersion")
+    app_name    = get_ipa_info_plist_value(ipa: app_patch, key: "CFBundleDisplayName")
+    app_url = option[:app_url]
+    app_icon = option[:app_icon]
+    dingTalk_url = "https://oapi.dingtalk.com/robot/send?access_token=f1e2ce520e7d85eb0629b61dd2325a06a089816023144e11a74fbf654f12c20b"
+    release = (option[:release]).to_i
+
+    title = ""
+    if release > 0
+      title = "生产环境版本"
+    else
+      title = "测试环境版本"
+    end
+
+    markdown = 
+    {
+      msgtype: "link", 
+      link: {
+          text: "iOS客户端#{app_name}#{app_version}已经打包完毕，请前往#{app_url}下载测试！如有问题，请联系iOS相关人员，我们会及时解决，谢谢!", 
+          title: "#{app_name}-" + title, 
+          picUrl: "#{app_icon}", 
+          messageUrl: "#{app_url}"
+      }
+    }
+
+    uri = URI.parse(dingTalk_url)
+    https = Net::HTTP.new(uri.host, uri.port)
+    https.use_ssl = true
+
+    request = Net::HTTP::Post.new(uri.request_uri)
+    request.add_field('Content-Type', 'application/json')
+    request.body = markdown.to_json
+
+    response = https.request(request)
+    puts "------------------------------"
+    puts "Response #{response.code} #{response.message}: #{response.body}"
+
+  end
+
+
+  lane :test do
+  
+  puts "测试一下"
+
+  end
+
+
+end
