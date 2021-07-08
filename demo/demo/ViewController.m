@@ -28,6 +28,8 @@
 //    NSLog(@"csrfToken = %@", [self encrypt_csrfTokenWithMobile:@"15215621210"]);
     
     [self loadGifView];
+    
+    self.view.backgroundColor = UIColor.greenColor;
 }
 
 - (void)loadGifView {
