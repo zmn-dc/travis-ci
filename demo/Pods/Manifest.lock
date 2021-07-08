@@ -1,0 +1,47 @@
+PODS:
+  - AFNetworking (4.0.1):
+    - AFNetworking/NSURLSession (= 4.0.1)
+    - AFNetworking/Reachability (= 4.0.1)
+    - AFNetworking/Security (= 4.0.1)
+    - AFNetworking/Serialization (= 4.0.1)
+    - AFNetworking/UIKit (= 4.0.1)
+  - AFNetworking/NSURLSession (4.0.1):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/Reachability (4.0.1)
+  - AFNetworking/Security (4.0.1)
+  - AFNetworking/Serialization (4.0.1)
+  - AFNetworking/UIKit (4.0.1):
+    - AFNetworking/NSURLSession
+  - DesignKit (0.1.0)
+  - WZLBadge (1.2.6)
+  - YYImage (1.0.4):
+    - YYImage/Core (= 1.0.4)
+  - YYImage/Core (1.0.4)
+
+DEPENDENCIES:
+  - AFNetworking
+  - DesignKit (from `./Frameworks/DesignKit`)
+  - WZLBadge (= 1.2.6)
+  - YYImage
+
+SPEC REPOS:
+  trunk:
+    - AFNetworking
+    - WZLBadge
+    - YYImage
+
+EXTERNAL SOURCES:
+  DesignKit:
+    :path: "./Frameworks/DesignKit"
+
+SPEC CHECKSUMS:
+  AFNetworking: 7864c38297c79aaca1500c33288e429c3451fdce
+  DesignKit: 2f13ddfdd805f3d94fc2e154c95f702b49d8a177
+  WZLBadge: 9ec779dcfd94c825518b395e8315fccaabff1bfa
+  YYImage: 1e1b62a9997399593e4b9c4ecfbbabbf1d3f3b54
+
+PODFILE CHECKSUM: 78210ff96cf5f3273ed9d59356b7d92bc99fd936
+
+COCOAPODS: 1.10.1

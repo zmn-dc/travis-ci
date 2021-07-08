@@ -1,0 +1,21 @@
+{
+  "name": "DesignKit",
+  "version": "0.1.0",
+  "summary": "DesignKit component",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/jifengchao/HYLOCFramework",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "daichao": "daichao@xiaoma.cn"
+  },
+  "source": {
+    "path": "."
+  },
+  "platforms": {
+    "ios": "9.0"
+  },
+  "source_files": "DesignKit/Classes/**/*"
+}
