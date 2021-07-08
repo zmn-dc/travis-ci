@@ -1,0 +1,16 @@
+language: objective-c
+
+osx_image: xcode12.3
+
+env:
+
+  global:
+
+    - CI_BUILD_NUMBER=${TRAVIS_BUILD_NUMBER}
+
+before_install:
+
+  - bundle install
+
+  - bundle exec pod install
+
